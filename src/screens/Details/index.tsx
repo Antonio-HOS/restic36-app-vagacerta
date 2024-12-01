@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { 
     Wrapper,
@@ -14,11 +14,31 @@ import {
 import Logo from '../../components/Logo';
 import theme from '../../theme';
 import { Button } from '../../components/Button';
+import api from '../../services/api'; // Certifique-se de que o caminho está correto
 
+export default function Details({ route, navigation }) {
+    const { id } = route.params;
+    const [details, setDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-export default function Details({route, navigation }) {
+    const fetchDetails = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get(`/vagas/${id}`); 
+            setDetails(response.data.job);
+            console.log(response.data)
+        } catch (err) {
+            setError('Erro ao buscar detalhes da vaga.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const {id} = route.params;
+    useEffect(() => {
+        fetchDetails();
+    }, []);
 
     return (
         <Wrapper>
@@ -36,15 +56,29 @@ export default function Details({route, navigation }) {
 
             <Container>
                 <ContentContainer>
-                    <Title>{JSON.stringify(id)}</Title>
-                    <Description>Com este id é possível ir no endpoint da API buscar o restante da informação.</Description>
+                    {loading ? (
+                        <Title>Carregando...</Title>
+                    ) : error ? (
+                        <Description>{error}</Description>
+                    ) : details ? (
+                        <>
+                            <Title>{details.title}</Title>
+                            <Description>{details.description}</Description>
+                            <Description>{details.telefone}</Description>
+                            <Description>{details.status}</Description>
+                            <Description>{details.telefone}</Description>
+                            <Description>{details.dataCadastro}</Description>
+                        </>
+                    ) : (
+                        <Description>Nenhuma informação encontrada.</Description>
+                    )}
                 </ContentContainer>
 
-                <Button 
+                {details && details.status === 'ativo' && <Button 
                     title="Entrar em contato" 
                     noSpacing={true} 
                     variant='primary'
-                    />
+                />}
             </Container>
         </Wrapper>
     );

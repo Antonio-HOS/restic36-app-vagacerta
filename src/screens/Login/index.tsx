@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image } from 'react-native';
+import { Image, Alert } from 'react-native';
 import { Wrapper, Container, Form, TextContainer, TextBlack, TextLink, TextLinkContainer } from './styles';
 import BGTop from '../../assets/BGTop.png';
 import Logo from '../../components/Logo';
@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../../contexts/UserContext'; // Importando o contexto
 
 export default function Login({ navigation }) {
-    const { setUser } = useUser(); // Obtendo a função setUser do contexto
+    const { setUser, saveToken } = useUser(); // Obtendo as funções do contexto
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [loading, setLoading] = useState(false);
@@ -21,33 +21,30 @@ export default function Login({ navigation }) {
 
         try {
             // Requisição para o login da API
-            const response = await api.post('/usuario/login', {
-                email: email,
-                senha: senha,
-            });
+            const response = await api.post('/usuario/login', { email, senha });
 
-            // Salva o token no AsyncStorage
-            await AsyncStorage.setItem('@token', response.data.token);
-            // await AsyncStorage.setItem('@email', response.data.email);
-            // await AsyncStorage.setItem('@senha', response.data.senha);
+            const { token, nome, email: userEmail, id } = response.data; // Ajuste com base no retorno real da API
 
-            // Atualiza os cabeçalhos do axios com o token para autenticação futura
-            api.defaults.headers.Authorization = `Bearer ${response.data.token}`;
+            // Salva o token no AsyncStorage e atualiza o contexto
+            await AsyncStorage.setItem('@token', token); 
+            await AsyncStorage.setItem('@user', JSON.stringify({ nome, email: userEmail, id })); 
+
+            saveToken(token); // Salva o token no contexto global
 
             // Atualiza os dados do usuário no contexto
-            setUser({
-                nome: response.data.nome,  // Aqui você precisa ajustar conforme o que a API retorna
-                email: response.data.email, // Ajuste para os dados reais que a API retorna
-                senha: response.data.senha, // Não é comum armazenar a senha no contexto, então pode deixar vazio
-                id: response.data.id // Ajuste para os dados reais que a API retorna
-            });
-            setSenha(''); // Limpa a senha após o login
+            setUser({ nome, email: userEmail, id });
+
+            // Configura os cabeçalhos do axios para autenticação futura
+            api.defaults.headers.Authorization = `Bearer ${token}`;
+
+            // Limpa o campo de senha
+            setSenha('');
+
             // Navega para a tela "Home" após o login bem-sucedido
             navigation.navigate('Auth', { screen: 'Home' });
-
         } catch (error) {
-            console.error('Erro no login', error.response || error);
-            // Aqui você pode exibir uma mensagem de erro se necessário
+            console.error('Erro no login:', error.response || error);
+            Alert.alert('Erro', 'Não foi possível realizar o login. Verifique suas credenciais.');
         } finally {
             setLoading(false); // Finaliza o loading
         }
@@ -61,14 +58,14 @@ export default function Login({ navigation }) {
                 <Form>
                     <Logo />
                     <Input 
-                        label='E-mail' 
-                        placeholder='Digite seu e-mail'
+                        label="E-mail" 
+                        placeholder="Digite seu e-mail"
                         value={email}
                         onChangeText={(text) => setEmail(text)} // Atualiza o email no estado
                     />
                     <Input 
-                        label='Senha' 
-                        placeholder='Digite sua senha'
+                        label="Senha" 
+                        placeholder="Digite sua senha"
                         value={senha}
                         onChangeText={(text) => setSenha(text)} // Atualiza a senha no estado
                         secureTextEntry // Para esconder a senha
@@ -76,7 +73,7 @@ export default function Login({ navigation }) {
                     <Button
                         title={loading ? 'Carregando...' : 'Entrar'} // Alterando o texto do botão enquanto carrega
                         noSpacing={true}
-                        variant='primary'
+                        variant="primary"
                         onPress={login}
                         disabled={loading} // Desabilita o botão enquanto o login está sendo feito
                     />

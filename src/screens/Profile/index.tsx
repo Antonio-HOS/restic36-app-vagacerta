@@ -21,66 +21,44 @@ import { LogOut } from "../../components/LogOut";
 
 export default function Profile({ navigation }) {
   // Acessando o contexto do usuário
-  const { user, setUser } = useUser(); // Pegando o estado do usuário e a função para atualizá-lo
+  const { user, setUser, clearUserAndToken } = useUser(); // Pegando o estado do usuário e a função para atualizá-lo
   const [senha, setSenha] = useState("");
 
-  // Recuperar o token do AsyncStorage
-  const getToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("@token"); // Recupera o token armazenado
-      return token; // Retorna o token
-    } catch (error) {
-      console.error("Erro ao recuperar o token", error);
-      return null; // Caso haja erro, retorna null
-    }
-  };
+;
 
   // Função PUT para atualizar os dados do perfil
   const handleSaveProfile = async () => {
-    const token = await getToken(); // Recupera o token
-    console.log(user);
-    if (token) {
-      try {
-        const response = await api.patch(
-          `/usuario/${user.id}`,
-          {
-            nome: user.nome, // Usa o nome do contexto
-            email: user.email, // Usa o email do contexto
-            senha: senha, // Usa a senha local
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Envia o token no cabeçalho
-            },
-          }
-        );
+    try {
+      const response = await api.patch(
+        `/usuario/${user.id}`,
+        {
+          nome: user.nome, // Usa o nome do contexto
+          email: user.email, // Usa o email do contexto
+          senha: senha, // Usa a senha local
+        },
+      );
 
-        // Exibe um alerta de sucesso
-        Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
-        setSenha(""); // Limpa a senha após a atualização
-        // Atualiza os dados no contexto após a atualização
-        setUser({
-            ...user,
-          nome: response.data.user.nome,
-          email: response.data.user.email,
-        });
-        console.log(response.data);
-      } catch (error) {
-        Alert.alert("Erro", "Erro ao salvar as informações.");
-        console.log(error);
-      }
-    } else {
-      Alert.alert("Erro", "Token não encontrado");
+      // Exibe um alerta de sucesso
+      Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
+      setSenha(""); // Limpa a senha após a atualização
+      // Atualiza os dados no contexto após a atualização
+      setUser({
+        ...user,
+        nome: response.data.user.nome,
+        email: response.data.user.email,
+      });
+      console.log(response.data);
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao salvar as informações.");
+      console.log(error);
     }
   };
 
   const handleLogOut = async () => {
     try {
-      // Limpa o token do AsyncStorage
-      await AsyncStorage.removeItem("@token");
+      clearUserAndToken();
       // Limpa o contexto de usuário
-      setUser({}); // ou setUser({}) caso queira preservar uma estrutura vazia
-      // Redireciona para a tela de login
+      setUser({}); 
       navigation.navigate("Login");
     } catch (error) {
       Alert.alert("Erro", "Erro ao fazer logout.");
@@ -130,9 +108,12 @@ export default function Profile({ navigation }) {
           onPress={handleSaveProfile} // Chama a função de salvar ao pressionar
         />
       </Container>
-        <LogOut title="Fazer LogOut" onPress={handleLogOut}  noSpacing={false}
-          variant="primary"
-          />
+      <LogOut
+        title="Fazer LogOut"
+        onPress={handleLogOut}
+        noSpacing={false}
+        variant="primary"
+      />
     </Wrapper>
   );
 }

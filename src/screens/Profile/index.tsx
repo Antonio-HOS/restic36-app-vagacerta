@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Feather } from "@expo/vector-icons";
-import { Alert } from "react-native";
+import { Alert, Keyboard, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "../../contexts/UserContext"; // Importando o contexto
 import {
@@ -24,19 +24,14 @@ export default function Profile({ navigation }) {
   const { user, setUser, clearUserAndToken } = useUser(); // Pegando o estado do usuário e a função para atualizá-lo
   const [senha, setSenha] = useState("");
 
-;
-
   // Função PUT para atualizar os dados do perfil
   const handleSaveProfile = async () => {
     try {
-      const response = await api.patch(
-        `/usuario/${user.id}`,
-        {
-          nome: user.nome, // Usa o nome do contexto
-          email: user.email, // Usa o email do contexto
-          senha: senha, // Usa a senha local
-        },
-      );
+      const response = await api.patch(`/usuario/${user.id}`, {
+        nome: user.nome, // Usa o nome do contexto
+        email: user.email, // Usa o email do contexto
+        senha: senha, // Usa a senha local
+      });
 
       // Exibe um alerta de sucesso
       Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
@@ -58,13 +53,31 @@ export default function Profile({ navigation }) {
     try {
       clearUserAndToken();
       // Limpa o contexto de usuário
-      setUser({}); 
+      setUser({});
       navigation.navigate("Login");
     } catch (error) {
       Alert.alert("Erro", "Erro ao fazer logout.");
       console.log(error);
     }
   };
+
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+//IDENTIFICAR SE O TECLADO ESTÁ ABERTO OU FECHADO
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    // Limpar os listeners ao desmontar o componente
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   return (
     <Wrapper>
@@ -108,12 +121,14 @@ export default function Profile({ navigation }) {
           onPress={handleSaveProfile} // Chama a função de salvar ao pressionar
         />
       </Container>
-      <LogOut
-        title="Fazer LogOut"
-        onPress={handleLogOut}
-        noSpacing={false}
-        variant="primary"
-      />
+      {!keyboardVisible && (
+        <LogOut
+          title="Fazer LogOut"
+          onPress={handleLogOut}
+          noSpacing={false}
+          variant="primary"
+        />
+      )}
     </Wrapper>
   );
 }

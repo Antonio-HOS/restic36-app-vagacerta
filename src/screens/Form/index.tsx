@@ -1,34 +1,89 @@
-import { Image } from 'react-native';
-import { Wrapper,Container, Form, TextContainer, TextBlack, TextLink, TextLinkContainer } from './styles';
-import BGTop from '../../assets/BGTop.png';
-import Logo from '../../components/Logo';
-import Input from '../../components/Input';
-import { Button } from '../../components/Button';
+import React, { useState } from "react";
+import { Image, Alert } from "react-native";
+import axios from "axios";
+import {
+  Wrapper,
+  Container,
+  Form,
+  TextContainer,
+  TextBlack,
+  TextLink,
+  TextLinkContainer,
+} from "./styles";
+import BGTop from "../../assets/BGTop.png";
+import Logo from "../../components/Logo";
+import Input from "../../components/Input";
+import { Button } from "../../components/Button";
+import api from "../../services/api";
 
-export default function FormScreen({navigation}) {
-    return (
-        <Wrapper>
-            <Image source={BGTop} />
+export default function FormScreen({ navigation }) {
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
 
-            <Container>
+  // Função para enviar os dados para o backend
+  const handleSubmit = async () => {
+    if (!nome || !email || !senha) {
+      Alert.alert("Erro", "Todos os campos são obrigatórios.");
+      return;
+    }
+  
+    try {
+      const response = await api.post("/api/usuarios/register", {
+        nome,
+        email,
+        senha,
+      });
+  
+      // Sucesso na requisição
+      Alert.alert("Sucesso", "Dados enviados com sucesso!");
+      navigation.navigate("Login");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Erro", "Ocorreu um erro ao enviar os dados.");
+    }
+  };
+  
+  return (
+    <Wrapper>
+      <Image source={BGTop} />
 
-                <Form>
-                    <Logo />
-                    <Input label='Nome' placeholder='digite seu nome'/>
-                    <Input label='E-mail' placeholder='digite seu e-mail'/>
-                    <Input label='Senha' placeholder='digite sua senha'/>
-                    <Button title="Entrar" noSpacing={true} variant='primary'/>
-                    <TextContainer>
-                        <TextBlack>Já tem uma conta?</TextBlack>
-                        <TextLinkContainer onPress={() => navigation.navigate('Login')}>
-                            <TextLink>
-                                    Faça seu login.
-                            </TextLink>
-                        </TextLinkContainer>
-                    </TextContainer>
-                </Form>
-
-            </Container>
-        </Wrapper>
-    );
+      <Container>
+        <Form>
+          <Logo />
+          <Input
+            label="Nome"
+            placeholder="Digite seu nome"
+            value={nome}
+            onChangeText={(text) => setNome(text)}
+          />
+          <Input
+            label="E-mail"
+            placeholder="Digite seu e-mail"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+          <Input
+            label="Senha"
+            placeholder="Digite sua senha"
+            secureTextEntry
+            value={senha}
+            onChangeText={(text) => setSenha(text)}
+          />
+          <Button
+            title="Criar conta"
+            noSpacing={true}
+            variant="primary"
+            onPress={handleSubmit}
+          />
+          <TextContainer>
+            <TextBlack>Já tem uma conta?</TextBlack>
+            <TextLinkContainer onPress={() => navigation.navigate("Login")}>
+              <TextLink>Faça seu login.</TextLink>
+            </TextLinkContainer>
+          </TextContainer>
+        </Form>
+      </Container>
+    </Wrapper>
+  );
 }

@@ -29,7 +29,7 @@ export default function FormScreen({ navigation }) {
     }
   
     try {
-      const response = await api.post("/api/usuarios/register", {
+      const response = await api.post("/usuario/register", {
         nome,
         email,
         senha,

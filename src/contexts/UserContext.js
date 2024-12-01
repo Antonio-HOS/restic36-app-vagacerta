@@ -56,8 +56,8 @@ export const UserProvider = ({ children }) => {
   const clearUserAndToken = async () => {
     try {
       await AsyncStorage.multiRemove(['@token', '@user']); // Remove ambos
-      setToken(null);
-      setUser(null);
+      setToken({});
+      setUser({});
       delete api.defaults.headers.Authorization; // Remove headers da API
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível remover os dados do usuário');

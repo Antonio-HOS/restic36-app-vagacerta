@@ -14,7 +14,8 @@ import {
 import Logo from '../../components/Logo';
 import theme from '../../theme';
 import { Button } from '../../components/Button';
-import api from '../../services/api'; // Certifique-se de que o caminho está correto
+import api from '../../services/api';
+import { Linking, Alert } from 'react-native';
 
 export default function Details({ route, navigation }) {
     const { id } = route.params;
@@ -39,6 +40,20 @@ export default function Details({ route, navigation }) {
     useEffect(() => {
         fetchDetails();
     }, []);
+
+    const openLink = () => {
+        const handleOpenLink = async () => {
+          const url = `https://wa.me/${details.telefone}?text=Olá%20Do%20Cepedi`; 
+          const supported = await Linking.canOpenURL(url);
+            console.log(url);
+          if (supported) {
+            await Linking.openURL(url); 
+          } else {
+            Alert.alert('Erro', `Não foi possível abrir o link: ${url}`);
+          }
+        }
+        handleOpenLink();
+    };
 
     return (
         <Wrapper>
@@ -75,6 +90,7 @@ export default function Details({ route, navigation }) {
                 </ContentContainer>
 
                 {details && details.status === 'ativo' && <Button 
+                    onPress={openLink}
                     title="Entrar em contato" 
                     noSpacing={true} 
                     variant='primary'

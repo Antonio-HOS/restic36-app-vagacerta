@@ -16,6 +16,7 @@ import theme from '../../theme';
 import { Button } from '../../components/Button';
 import api from '../../services/api';
 import { Linking, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Details({ route, navigation }) {
     const { id } = route.params;
@@ -24,9 +25,19 @@ export default function Details({ route, navigation }) {
     const [error, setError] = useState(null);
 
     const fetchDetails = async () => {
-        try {
+
+        try { const storedToken = await AsyncStorage.getItem("@token");
+            if (storedToken) {
+              api.defaults.headers.Authorization = `Bearer ${storedToken};`;
+            }
+           
+           
             setLoading(true);
-            const response = await api.get(`/vagas/${id}`); 
+            const response = await api.get(`/vagas/${id}`,{
+                headers: {
+                    Authorization: `Bearer ${storedToken}`,
+                }
+            }); 
             setDetails(response.data.job);
             console.log(response.data)
         } catch (err) {

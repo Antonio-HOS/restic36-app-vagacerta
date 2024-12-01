@@ -1,59 +1,50 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, FlatList, View, Text } from 'react-native';
 import { Wrapper,Container, ListContainer, TextVagas } from './styles';
 import BGTop from '../../assets/BGTop.png';
 import Logo from '../../components/Logo';
 import VagaCard from '../../components/VagaCard';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../services/api';
 
 
 export default function List() {
+    const [vagas, setVagas] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+    
+    useEffect(() => {
+      const fetchVagas = async () => {
+          try {
+                const storedToken = await AsyncStorage.getItem('@token');
+                  if (storedToken) {
+                     api.defaults.headers.Authorization = `Bearer ${storedToken};`
+                   }
+                  const response = await api.get("/vagas",{
+                      headers: {
+                          Authorization: `Bearer ${storedToken}`
+                      }
+                  }); 
+                  setVagas(response.data.jobs);
+                  setLoading(false);
+                  console.log(response.data);
+              }
+          catch (error) {
+              console.log('Erro ao recuperar vagas:', error);
+              setLoading(false);
+          }
+      };
 
-
-    const DATA = [
-        {
-          "id": 1,
-          "titulo": "Desenvolvedor Front-end",
-          "data_cadastro": "2024-06-21",
-          "empresa": "Tech Solutions"
-        },
-        {
-          "id": 2,
-          "titulo": "Analista de Dados",
-          "data_cadastro": "2024-06-18",
-          "empresa": "Data Insights"
-        },
-        {
-          "id": 3,
-          "titulo": "Gerente de Projetos",
-          "data_cadastro": "2024-06-15",
-          "empresa": "Project Masters"
-        },
-        {
-          "id": 4,
-          "titulo": "Gerente de Projetos",
-          "data_cadastro": "2024-06-15",
-          "empresa": "Project Masters"
-        },
-        {
-          "id": 5,
-          "titulo": "Gerente de Projetos",
-          "data_cadastro": "2024-06-15",
-          "empresa": "Project Masters"
-        },
-        {
-          "id": 6,
-          "titulo": "Gerente de Projetos",
-          "data_cadastro": "2024-06-15",
-          "empresa": "Project Masters"
-        },
-        {
-          "id": 7,
-          "titulo": "Gerente de Projetos",
-          "data_cadastro": "2024-06-15",
-          "empresa": "Project Masters"
-        }
-      ]
-
+      fetchVagas();
+  }, []);
+    if(loading){
+        return(
+            <View>
+                <Text>Carregando...</Text>
+            </View>
+        )
+    }
+    const DATA = vagas;
     return (
         <Wrapper>
             <Image source={BGTop} style={{maxHeight: 86}}/>
@@ -69,8 +60,8 @@ export default function List() {
                         renderItem={({item}) => 
                             <VagaCard
                                 id={item.id}
-                                title={item.titulo} 
-                                dataCreated={item.data_cadastro}
+                                title={item.title} 
+                                dataCreated={item.dataCadastro}
                                 company={item.empresa}
                             />
                         }

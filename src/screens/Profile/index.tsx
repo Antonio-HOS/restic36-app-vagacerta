@@ -17,6 +17,7 @@ import theme from "../../theme";
 import Input from "../../components/Input";
 import { Button } from "../../components/Button";
 import api from "../../services/api";
+import { LogOut } from "../../components/LogOut";
 
 export default function Profile({ navigation }) {
   // Acessando o contexto do usuário
@@ -73,6 +74,20 @@ export default function Profile({ navigation }) {
     }
   };
 
+  const handleLogOut = async () => {
+    try {
+      // Limpa o token do AsyncStorage
+      await AsyncStorage.removeItem("@token");
+      // Limpa o contexto de usuário
+      setUser({}); // ou setUser({}) caso queira preservar uma estrutura vazia
+      // Redireciona para a tela de login
+      navigation.navigate("Login");
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao fazer logout.");
+      console.log(error);
+    }
+  };
+
   return (
     <Wrapper>
       <Header>
@@ -101,7 +116,7 @@ export default function Profile({ navigation }) {
           />
           <Input
             label="Senha"
-            placeholder="Atualize a sua senha sua senha"
+            placeholder="Atualize a sua senha"
             secureTextEntry
             value={senha}
             onChangeText={setSenha} // Atualiza a senha localmente
@@ -115,6 +130,9 @@ export default function Profile({ navigation }) {
           onPress={handleSaveProfile} // Chama a função de salvar ao pressionar
         />
       </Container>
+        <LogOut title="Fazer LogOut" onPress={handleLogOut}  noSpacing={false}
+          variant="primary"
+          />
     </Wrapper>
   );
 }

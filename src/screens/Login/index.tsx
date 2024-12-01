@@ -41,7 +41,7 @@ export default function Login({ navigation }) {
                 senha: response.data.senha, // Não é comum armazenar a senha no contexto, então pode deixar vazio
                 id: response.data.id // Ajuste para os dados reais que a API retorna
             });
-
+            setSenha(''); // Limpa a senha após o login
             // Navega para a tela "Home" após o login bem-sucedido
             navigation.navigate('Auth', { screen: 'Home' });
 

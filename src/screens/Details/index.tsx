@@ -54,7 +54,12 @@ export default function Details({ route, navigation }) {
 
   const openLink = () => {
     const handleOpenLink = async () => {
-      const url = `https://wa.me/${details.telefone}?text=Olá%20Do%20Cepedi`;
+
+        var numero = details.telefone.replace(/\D/g, '');
+        if (numero.length == 11) {
+            numero = `55${numero}`;
+        }
+      const url = `https://wa.me/${numero}?text=Olá%20Do%20Cepedi`;
       const supported = await Linking.canOpenURL(url);
       console.log(url);
       if (supported) {

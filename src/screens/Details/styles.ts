@@ -62,6 +62,6 @@ export const Info = styled.Text`
   font-size: ${({theme})=>theme.FONT_SIZE.SM}px;
   font-weight: 400;
   text-align: left;
-  margin-left: 15;
+  margin-left: 15px;
   color: ${({theme})=>theme.COLORS.BLACK};
 `;

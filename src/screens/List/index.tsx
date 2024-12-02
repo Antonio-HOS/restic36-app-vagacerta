@@ -1,38 +1,43 @@
 import React, { useEffect } from "react";
-import { Image, FlatList, View, Text } from "react-native";
+import { Image, FlatList, View, Text, Alert } from "react-native";
 import { Wrapper, Container, ListContainer, TextVagas } from "./styles";
-import BGTop from "../../assets/BGTop.png";
+import BGTop from "../../assets/vagas2.webp";
 import Logo from "../../components/Logo";
 import VagaCard from "../../components/VagaCard";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../services/api";
+import { Atualizar } from "../../components/Atualizar";
 
 export default function List() {
   const [vagas, setVagas] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
-    const fetchVagas = async () => {
-      try {
-        const storedToken = await AsyncStorage.getItem("@token");
-        if (storedToken) {
-          api.defaults.headers.Authorization = `Bearer ${storedToken};`;
-        }
-        const response = await api.get("/vagas", {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        });
-        setVagas(response.data.jobs);
-        setLoading(false);
-        console.log(response.data);
-      } catch (error) {
-        console.log("Erro ao recuperar vagas:", error);
-        setLoading(false);
-      }
-    };
+  const handleAtualizar = () => {
+    fetchVagas();
+    Alert.alert("Atualizado com sucesso!");
+  };
 
+  const fetchVagas = async () => {
+    try {
+      const storedToken = await AsyncStorage.getItem("@token");
+      if (storedToken) {
+        api.defaults.headers.Authorization = `Bearer ${storedToken};`;
+      }
+      const response = await api.get("/vagas", {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+      setVagas(response.data.jobs);
+      setLoading(false);
+      console.log(response.data);
+    } catch (error) {
+      console.log("Erro ao recuperar vagas:", error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchVagas();
   }, []);
   if (loading) {
@@ -45,11 +50,18 @@ export default function List() {
   const DATA = vagas;
   return (
     <Wrapper>
-      <Image source={BGTop} style={{ maxHeight: 86 }} />
+      <Image source={BGTop} style={{ height: 150 }} />
 
       <Container>
         <Logo />
         <TextVagas>{DATA.length} vagas encontradas!</TextVagas>
+
+        <Atualizar
+          title="Atualizar"
+          noSpacing={false}
+          variant="primary"
+          onPress={handleAtualizar}
+        />
         <ListContainer>
           <FlatList
             data={DATA}
@@ -71,7 +83,6 @@ export default function List() {
             )}
           />
         </ListContainer>
-      
       </Container>
     </Wrapper>
   );

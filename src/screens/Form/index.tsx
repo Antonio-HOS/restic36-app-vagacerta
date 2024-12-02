@@ -10,7 +10,7 @@ import {
   TextLink,
   TextLinkContainer,
 } from "./styles";
-import BGTop from "../../assets/BGTop.png";
+import BGTop from "../../assets/vagas2.webp";
 import Logo from "../../components/Logo";
 import Input from "../../components/Input";
 import { Button } from "../../components/Button";
@@ -46,7 +46,11 @@ export default function FormScreen({ navigation }) {
   
   return (
     <Wrapper>
-      <Image source={BGTop} />
+         <Image
+        source={BGTop}
+        style={{ maxHeight: 260, width: "100%" }}
+        resizeMode="cover"
+      />
 
       <Container>
         <Form>

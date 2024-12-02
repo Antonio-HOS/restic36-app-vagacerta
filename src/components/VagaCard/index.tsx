@@ -23,7 +23,7 @@ export default function VagaCard({id, title, dataCreated, company}: Data) {
         <Container onPress={() => navigation.navigate('Details', { id })}>
             <Content>
                 <Title numberOfLines={1}>{title}</Title>
-                <Data>{dataCreated}</Data>
+                <Data>Criado: {dataCreated}</Data>
                 <Company numberOfLines={1}>{company}</Company>
             </Content>
             <OpenButton>

@@ -55,5 +55,13 @@ export const Description = styled.Text`
   font-size: ${({theme})=>theme.FONT_SIZE.SM}px;
   font-weight: 400;
   text-align: left;
+  font-weight: 900;
+  color: ${({theme})=>theme.COLORS.BLACK};
+`;
+export const Info = styled.Text`
+  font-size: ${({theme})=>theme.FONT_SIZE.SM}px;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15;
   color: ${({theme})=>theme.COLORS.BLACK};
 `;

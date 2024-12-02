@@ -70,7 +70,7 @@ export default function List() {
               <VagaCard
                 id={item.id}
                 title={item.title}
-                dataCreated={item.dataCadastro}
+                dataCreated={item.dataCadastro.slice(0, 10)}
                 company={item.empresa}
               />
             )}

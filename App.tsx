@@ -71,7 +71,7 @@ export default function App() {
           setInitialRoute("Auth"); // Redireciona para "Home" se o token existir
         }
       } catch (error) {
-        console.error("Erro ao verificar token:", error);
+        // console.error("Erro ao verificar token:", error);
       } finally {
         setLoading(false); // Termina o carregamento
       }

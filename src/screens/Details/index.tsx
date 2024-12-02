@@ -42,7 +42,7 @@ export default function Details({ route, navigation }) {
       console.log(response.data);
     } catch (err) {
       setError("Erro ao buscar detalhes da vaga.");
-      console.error(err);
+    //   console.error(err);
     } finally {
       setLoading(false);
     }

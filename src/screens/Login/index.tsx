@@ -54,7 +54,7 @@ export default function Login({ navigation }) {
       // Navega para a tela "Home" após o login bem-sucedido
       navigation.navigate("Auth", { screen: "Home" });
     } catch (error) {
-      console.error("Erro no login:", error.response || error);
+    //   console.error("Erro no login:", error.response || error);
       Alert.alert(
         "Erro",
         "Não foi possível realizar o login. Verifique suas credenciais."
